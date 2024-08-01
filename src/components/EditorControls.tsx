@@ -35,6 +35,7 @@ export default function EditorControls({
 }: EditorControlsProps) {
   const [saving, setSaving] = useState<boolean>(false);
   const [recentlySaved, setRecentlySaved] = useState<boolean>(false);
+  const [pasteLink, setPasteLink] = useState<string | null>(null);
 
   useEffect(() => {
     setRecentlySaved(false);
@@ -45,15 +46,17 @@ export default function EditorControls({
       return;
     }
     setSaving(true);
-    saveToBytebin(actualContent, language).then(pasteId => {
+    saveToBytebin(actualContent, language).then((pasteId) => {
       setSaving(false);
       setRecentlySaved(true);
       if (pasteId) {
+        const newPasteLink = window.location.origin + '/' + pasteId;
         history.replace({
           pathname: pasteId,
         });
-        copy(window.location.href);
+        copy(newPasteLink);
         document.title = 'paste | ' + pasteId;
+        setPasteLink(newPasteLink);
       }
     });
   }, [actualContent, language, recentlySaved]);
@@ -89,6 +92,7 @@ export default function EditorControls({
       hash: '',
     });
     document.title = 'paste';
+    setPasteLink(null); // Clear the paste link on reset
   }
 
   function unsetReadOnly() {
@@ -110,6 +114,13 @@ export default function EditorControls({
         />
         {readOnly && <Button onClick={unsetReadOnly}>[edit]</Button>}
       </Section>
+      {pasteLink && (
+        <LinkSection>
+          <Link href={pasteLink} target="_blank" rel="noopener noreferrer">
+            View Paste: {pasteLink}
+          </Link>
+        </LinkSection>
+      )}
       <Section>
         <Button onClick={() => zoom(1)}>[+ </Button>
         <Button onClick={() => zoom(-1)}> -]</Button>
@@ -139,10 +150,11 @@ const Header = styled.header`
   z-index: 2;
   width: 100%;
   height: 2em;
-  color: ${props => props.theme.primary};
-  background: ${props => props.theme.secondary};
+  color: ${(props) => props.theme.primary};
+  background: ${(props) => props.theme.secondary};
   display: flex;
   justify-content: space-between;
+  align-items: center;
   user-select: none;
 `;
 
@@ -154,5 +166,19 @@ const Section = styled.div`
     .optional {
       display: none;
     }
+  }
+`;
+
+const LinkSection = styled.div`
+  flex-grow: 1;
+  text-align: center;
+`;
+
+const Link = styled.a`
+  font-size: 1.2em;
+  color: ${(props) => props.theme.primary};
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
   }
 `;

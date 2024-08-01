@@ -57,6 +57,7 @@ export default function EditorControls({
         copy(newPasteLink);
         document.title = 'paste | ' + pasteId;
         setPasteLink(newPasteLink);
+        console.log('Paste link generated:', newPasteLink); // Debugging line
       }
     });
   }, [actualContent, language, recentlySaved]);

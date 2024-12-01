@@ -134,7 +134,7 @@ export default function EditorControls({
         <Button
           className="optional"
           as="a"
-          href="https://pastes.bytedev.us/"
+          href="https://code.obliqua.design/"
           target="_blank"
           rel="noreferrer"
         >
